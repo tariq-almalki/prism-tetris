@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111522" />
+    <meta
+      name="description"
+      content="Play Prism, a tactile Three.js Tetris game with keyboard and touch controls, hold, landing previews, and an endless marathon."
+    />
+    <title>Prism — Tetris</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#game">Skip to game</a>
+    <header class="header">
+      <a class="brand" href="./" aria-label="Prism home"
+        ><svg viewBox="0 0 32 32" aria-hidden="true">
+          <g fill="currentColor">
+            <rect x="2" y="2" width="12" height="12" rx="3" />
+            <rect x="18" y="2" width="12" height="12" rx="3" />
+            <rect x="18" y="18" width="12" height="12" rx="3" />
+          </g></svg
+        ><span>prism<span class="brand-dot">.</span></span></a
+      >
+      <div class="header-actions">
+        <button
+          class="icon-button"
+          id="sound-button"
+          aria-label="Turn sound on"
+          aria-pressed="false"
+          title="Turn sound on"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m11 4-6 5H2v6h3l6 5V4Zm5 5 5 6m0-6-5 6" />
+          </svg>
+        </button>
+        <button class="help-button" id="help-button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4m0 3h.01" /></svg
+          >How to play
+        </button>
+      </div>
+    </header>
+    <main id="game" tabindex="-1">
+      <div class="game-heading">
+        <div>
+          <div class="game-label">
+            <span class="small-block" aria-hidden="true"></span> The classics
+          </div>
+          <h1>Tetris</h1>
+        </div>
+        <span class="mode-tag">Marathon</span>
+      </div>
+      <div class="game-layout">
+        <aside class="left-panel" aria-label="Game statistics and held piece">
+          <section class="score-panel">
+            <h2>Score</h2>
+            <div id="score" class="score-value">000000</div>
+            <div class="record">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M8 3h8v7a4 4 0 0 1-8 0V3Zm0 2H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4M12 14v5m-4 2h8"
+                /></svg
+              >Best <span id="best-score">0</span>
+            </div>
+            <div class="stat-pair">
+              <div>
+                <h3>Level</h3>
+                <strong id="level">01</strong>
+              </div>
+              <div>
+                <h3>Lines</h3>
+                <strong id="lines">00</strong>
+              </div>
+            </div>
+            <div
+              class="level-progress"
+              role="progressbar"
+              aria-label="Lines until next level"
+              aria-valuemin="0"
+              aria-valuemax="10"
+              aria-valuenow="0"
+            >
+              <span id="level-progress"></span>
+            </div>
+            <p class="level-caption">
+              <span id="lines-remaining">10</span> lines to next level
+            </p>
+          </section>
+          <section class="hold-panel">
+            <div class="section-heading">
+              <h2>Hold</h2>
+              <kbd>Shift</kbd>
+            </div>
+            <div id="hold-piece" class="hold-slot">
+              <span class="hold-empty">Save a piece<br />for later</span>
+            </div>
+          </section>
+          <section class="controls-panel" aria-label="Keyboard controls">
+            <h2>Make your move</h2>
+            <dl>
+              <div>
+                <dt>Move</dt>
+                <dd><kbd>←</kbd><kbd>→</kbd></dd>
+              </div>
+              <div>
+                <dt>Rotate</dt>
+                <dd><kbd>↑</kbd></dd>
+              </div>
+              <div>
+                <dt>Soft drop</dt>
+                <dd><kbd>↓</kbd></dd>
+              </div>
+              <div>
+                <dt>Hard drop</dt>
+                <dd><kbd class="wide-key">Space</kbd></dd>
+              </div>
+            </dl>
+          </section>
+        </aside>
+        <section class="board-column" aria-label="Tetris play area">
+          <div class="board-frame">
+            <div class="board-toolbar">
+              <span id="game-status">Ready to play</span
+              ><button
+                id="pause-button"
+                class="icon-button small"
+                aria-label="Pause game"
+                disabled
+                title="Pause (P)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14m8-14v14" />
+                </svg>
+              </button>
+            </div>
+            <div
+              id="canvas-host"
+              class="canvas-host"
+              role="img"
+              aria-label="Tetris board, ten columns by twenty rows"
+            >
+              <div id="overlay" class="board-overlay">
+                <div class="overlay-symbol" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <p id="overlay-eyebrow">One more round?</p>
+                <h2 id="overlay-title">Find your flow.</h2>
+                <p id="overlay-copy">
+                  Stack blocks. Clear lines.<br />See how far you can go.
+                </p>
+                <button id="play-button" class="primary-button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m8 5 11 7-11 7V5Z" /></svg
+                  >Play Tetris
+                </button>
+                <p id="overlay-hint">or press <kbd>Enter</kbd></p>
+              </div>
+              <div
+                id="board-announcement"
+                class="board-announcement"
+                aria-hidden="true"
+              ></div>
+            </div>
+            <div class="board-footer">
+              <span
+                ><span class="landing-icon" aria-hidden="true"></span>Landing
+                preview</span
+              ><span id="elapsed">00:00</span>
+            </div>
+          </div>
+          <div class="board-shortcuts">
+            <span><kbd>P</kbd> Pause</span
+            ><button id="restart-button" class="text-button" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 11a9 9 0 1 1 3 7M3 5v6h6" /></svg
+              >Restart
+            </button>
+          </div>
+        </section>
+        <aside class="right-panel" aria-label="Upcoming pieces">
+          <div class="section-heading">
+            <h2>Up next</h2>
+            <span class="queue-count">5 pieces</span>
+          </div>
+          <div id="next-pieces" class="next-pieces"></div>
+          <div class="tip">
+            <span class="tip-spark" aria-hidden="true">✦</span>
+            <p>
+              Leave a little room.<br />The perfect piece<br />is on its way.
+            </p>
+          </div>
+        </aside>
+        <div class="touch-controls" aria-label="Touch controls">
+          <button data-action="hold" aria-label="Hold piece">Hold</button
+          ><button data-action="left" aria-label="Move left">←</button
+          ><button data-action="rotate" aria-label="Rotate clockwise">↻</button
+          ><button data-action="right" aria-label="Move right">→</button
+          ><button data-action="down" aria-label="Soft drop">↓</button
+          ><button
+            data-action="drop"
+            aria-label="Hard drop"
+            class="drop-button"
+          >
+            Drop
+          </button>
+        </div>
+      </div>
+      <footer class="page-footer">
+        <span>Seven shapes. Endless possibilities.</span
+        ><span class="footer-mark" aria-hidden="true">✦</span
+        ><span>Made to play.</span>
+      </footer>
+      <p id="live-status" class="sr-only" role="status" aria-live="polite"></p>
+    </main>
+    <dialog id="help-dialog">
+      <div class="dialog-heading">
+        <h2>How to play</h2>
+        <button
+          class="icon-button"
+          data-close-dialog="help-dialog"
+          aria-label="Close instructions"
+        >
+          ×
+        </button>
+      </div>
+      <p>
+        Fit the falling pieces together. Fill a horizontal row to clear it.
+        Every 10 lines increases your level and the falling speed.
+      </p>
+      <dl class="help-controls">
+        <div>
+          <dt>Move left / right</dt>
+          <dd>← / → or A / D</dd>
+        </div>
+        <div>
+          <dt>Rotate clockwise</dt>
+          <dd>↑ or X</dd>
+        </div>
+        <div>
+          <dt>Rotate counterclockwise</dt>
+          <dd>Z</dd>
+        </div>
+        <div>
+          <dt>Soft drop</dt>
+          <dd>↓ or S</dd>
+        </div>
+        <div>
+          <dt>Hard drop</dt>
+          <dd>Space</dd>
+        </div>
+        <div>
+          <dt>Hold a piece</dt>
+          <dd>Shift or C</dd>
+        </div>
+        <div>
+          <dt>Pause / resume</dt>
+          <dd>P or Escape</dd>
+        </div>
+      </dl>
+      <p class="help-note">
+        The outline shows where your piece will land. You can hold once per
+        piece. On a touch screen, use the buttons below the board.
+      </p>
+      <button class="primary-button" data-close-dialog="help-dialog">
+        Got it
+      </button>
+    </dialog>
+    <dialog id="restart-dialog">
+      <div class="dialog-heading">
+        <h2>Start a new game?</h2>
+        <button
+          class="icon-button"
+          data-close-dialog="restart-dialog"
+          aria-label="Cancel restart"
+        >
+          ×
+        </button>
+      </div>
+      <p>
+        Your current score will be reset. Your best score stays saved on this
+        device.
+      </p>
+      <div class="dialog-actions">
+        <button class="secondary-button" data-close-dialog="restart-dialog">
+          Keep playing</button
+        ><button id="confirm-restart" class="primary-button">New game</button>
+      </div>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
