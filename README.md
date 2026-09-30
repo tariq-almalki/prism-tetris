@@ -4,6 +4,8 @@ A playable Tetris frontend built with Three.js and Vite. Gameplay runs entirely 
 
 Source: [tariq-almalki/prism-tetris](https://github.com/tariq-almalki/prism-tetris).
 
+Play online: [prism-tetris.vercel.app](https://prism-tetris.vercel.app/).
+
 ## Run locally
 
 From this directory:
@@ -43,7 +45,7 @@ Production output is `dist/`. Twenty automated gameplay tests cover collision, r
 
 ## Vercel deployment
 
-Import this GitHub repository into Vercel. `vercel.json` specifies the Vite framework, `npm run build`, and the `dist` output directory. No environment variables or backend are needed. Google Fonts supplies the typefaces, with local system fonts as a fallback.
+The production game is deployed at https://prism-tetris.vercel.app/. This GitHub repository is connected to Vercel, so pushes to `main` deploy automatically. `vercel.json` specifies the Vite framework, `npm run build`, and the `dist` output directory. No environment variables or backend are needed. Google Fonts supplies the typefaces, with local system fonts as a fallback.
 
 ## Source layout
 
